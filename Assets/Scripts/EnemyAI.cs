@@ -33,6 +33,7 @@ public class EnemyAI : MonoBehaviour
 
     private void Update()
     {
+        agent.isStopped = false;
         //Check for in sight and attack range
         playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
         playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
@@ -72,19 +73,23 @@ public class EnemyAI : MonoBehaviour
 
     private void AttackPlayer()
     {
-        agent.SetDestination(transform.position);
+        agent.isStopped = true;
 
-        transform.LookAt(player);
+        Vector3 lookPos = player.position;
+        lookPos.y = transform.position.y;
+        transform.LookAt(lookPos);
 
-        if(!alreadyAttacked)
-        { 
-            //attack code
+        if (!alreadyAttacked)
+        {
+            Rigidbody rb = Instantiate(
+                projectile,
+                transform.position + transform.forward + Vector3.up,
+                Quaternion.identity
+            ).GetComponent<Rigidbody>();
 
-            Rigidbody rb = Instantiate(projectile, transform.position, Quaternion.identity).GetComponent<Rigidbody>();
-            rb.AddForce(transform.forward * 32f, ForceMode.Impulse);
-            rb.AddForce(transform.up * 8f, ForceMode.Impulse);
+            rb.AddForce(transform.forward * 20f, ForceMode.Impulse);
 
-            //
+            Destroy(rb.gameObject, 3f);
 
             alreadyAttacked = true;
             Invoke(nameof(ResetAttack), timeBetweenAttacks);
@@ -94,6 +99,7 @@ public class EnemyAI : MonoBehaviour
     private void ResetAttack()
     {
         alreadyAttacked = false;
+        agent.isStopped = false;
     }
 
     public void TakeDamage(int  damage)
