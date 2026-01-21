@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
-    public Camera PlayerCamera;
     public bool isShooting, readyToShoot;
     bool allowRest = true;
     public float shootingDelay = 2f;
@@ -16,6 +15,10 @@ public class Weapon : MonoBehaviour
     public Transform bulletSpawn;
     public float bulletVelocity = 30;
     public float BulletPrefabLifeTime = 3f;
+
+    public float reloadTime;
+    public int magazineSize, bulletsLeft;
+    public bool isReloading;
 
     public enum ShootingMode
     {
@@ -30,6 +33,8 @@ public class Weapon : MonoBehaviour
     {
         readyToShoot = true;
         burstBulletsLeft = bulletsPerBurst;
+
+        bulletsLeft = magazineSize;
     }
 
     public Vector3 spawnPosition;
@@ -46,15 +51,32 @@ public class Weapon : MonoBehaviour
             isShooting = Input.GetKeyDown(KeyCode.Mouse0);
         }
 
-        if(readyToShoot && isShooting)
+        if(Input.GetKeyDown(KeyCode.R) && bulletsLeft < magazineSize && isReloading == false)
+        {
+            Reload();
+        }
+
+        if(readyToShoot && isShooting == false && isReloading == false && bulletsLeft <= 0)
+        {
+            Reload();
+        }
+
+        if(readyToShoot && isShooting && bulletsLeft > 0)
         {
             burstBulletsLeft = bulletsPerBurst;
             FireWeapon();
+        }
+
+        if(AmmoManager.Instance.ammoDisplay != null)
+        {
+            AmmoManager.Instance.ammoDisplay.text = $"{bulletsLeft/bulletsPerBurst}/{magazineSize/bulletsPerBurst}";
         }
     }
 
     private void FireWeapon()
     {
+        bulletsLeft--;
+
         readyToShoot = false;
 
         Vector3 shootingDirection = CalculateDirectionAndSpread().normalized;
@@ -80,6 +102,18 @@ public class Weapon : MonoBehaviour
         }
     }
 
+    private void Reload()
+    {
+        isReloading = true;
+        Invoke("ReloadCompleted", reloadTime);
+    }
+
+    private void ReloadCompleted()
+    {
+        bulletsLeft = magazineSize;
+        isReloading = false;
+    }
+
     private void ResetShot()
     {
         readyToShoot = true;
@@ -88,7 +122,7 @@ public class Weapon : MonoBehaviour
 
     public Vector3 CalculateDirectionAndSpread()
     {
-        Ray ray = PlayerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
 
         Vector3 targetPoint;
