@@ -3,7 +3,7 @@ using UnityEngine;
 public class InventoryToggle : MonoBehaviour
 {
     public CanvasGroup inventoryGroup;
-    public KeyCode toggleKey = KeyCode.E;
+    public KeyCode toggleKey = KeyCode.Tab;  
 
     private bool isOpen = false;
 
