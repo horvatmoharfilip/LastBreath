@@ -8,9 +8,9 @@ public class Weapon : MonoBehaviour
     bool allowRest = true;
     public float shootingDelay = 2f;
     public int bulletsPerBurst = 3;
-    public int burstBulletsLeft;  
-    public float spreadIntensity;
+    public int burstBulletsLeft;
 
+    // Removed spreadIntensity
     public GameObject BulletPrefab;
     public Transform bulletSpawn;
     public float bulletVelocity = 30;
@@ -46,30 +46,30 @@ public class Weapon : MonoBehaviour
         {
             isShooting = Input.GetKeyDown(KeyCode.Mouse0);
         }
-        else if(currentShootingMode == ShootingMode.Single || currentShootingMode == ShootingMode.Burst)
+        else if (currentShootingMode == ShootingMode.Single || currentShootingMode == ShootingMode.Burst)
         {
             isShooting = Input.GetKeyDown(KeyCode.Mouse0);
         }
 
-        if(Input.GetKeyDown(KeyCode.R) && bulletsLeft < magazineSize && isReloading == false)
+        if (Input.GetKeyDown(KeyCode.R) && bulletsLeft < magazineSize && isReloading == false)
         {
             Reload();
         }
 
-        if(readyToShoot && isShooting == false && isReloading == false && bulletsLeft <= 0)
+        if (readyToShoot && isShooting == false && isReloading == false && bulletsLeft <= 0)
         {
             Reload();
         }
 
-        if(readyToShoot && isShooting && bulletsLeft > 0)
+        if (readyToShoot && isShooting && bulletsLeft > 0)
         {
             burstBulletsLeft = bulletsPerBurst;
             FireWeapon();
         }
 
-        if(AmmoManager.Instance.ammoDisplay != null)
+        if (AmmoManager.Instance.ammoDisplay != null)
         {
-            AmmoManager.Instance.ammoDisplay.text = $"{bulletsLeft/bulletsPerBurst}/{magazineSize/bulletsPerBurst}";
+            AmmoManager.Instance.ammoDisplay.text = $"{bulletsLeft / bulletsPerBurst}/{magazineSize / bulletsPerBurst}";
         }
     }
 
@@ -79,23 +79,21 @@ public class Weapon : MonoBehaviour
 
         readyToShoot = false;
 
-        Vector3 shootingDirection = CalculateDirectionAndSpread().normalized;
-    
+        Vector3 shootingDirection = CalculateDirection().normalized;
+
         GameObject bullet = Instantiate(BulletPrefab, bulletSpawn.position, Quaternion.identity);
 
         bullet.transform.forward = shootingDirection;
-
         bullet.GetComponent<Rigidbody>().AddForce(shootingDirection * bulletVelocity, ForceMode.Impulse);
-
         StartCoroutine(DestroyBulletAfterTime(bullet, BulletPrefabLifeTime));
 
-        if(allowRest)
+        if (allowRest)
         {
             Invoke("ResetShot", shootingDelay);
             allowRest = false;
         }
 
-        if(currentShootingMode == ShootingMode.Burst && burstBulletsLeft > 1)
+        if (currentShootingMode == ShootingMode.Burst && burstBulletsLeft > 1)
         {
             burstBulletsLeft--;
             Invoke("FireWeapon", shootingDelay);
@@ -120,29 +118,26 @@ public class Weapon : MonoBehaviour
         allowRest = true;
     }
 
-    public Vector3 CalculateDirectionAndSpread()
+    // No spread version
+    public Vector3 CalculateDirection()
     {
-        Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f));
         RaycastHit hit;
 
         Vector3 targetPoint;
-        if(Physics.Raycast(ray, out hit))
+        if (Physics.Raycast(ray, out hit, 100f))
         {
             targetPoint = hit.point;
         }
         else
         {
-            targetPoint = ray.GetPoint(100);
+            targetPoint = ray.GetPoint(100f);
         }
 
-        Vector3 direction = targetPoint - bulletSpawn.position;
-
-        float x = UnityEngine.Random.Range(-spreadIntensity, spreadIntensity);
-        float y = UnityEngine.Random.Range(-spreadIntensity, spreadIntensity);
-
-        return direction + new Vector3(x, y, 0);
+        Vector3 direction = (targetPoint - bulletSpawn.position).normalized;
+        return direction; // Straight shot, no spread
     }
-    
+
     private IEnumerator DestroyBulletAfterTime(GameObject bullet, float delay)
     {
         yield return new WaitForSeconds(delay);

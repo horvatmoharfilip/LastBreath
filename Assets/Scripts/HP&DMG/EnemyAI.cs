@@ -1,47 +1,58 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
     public NavMeshAgent agent;
 
-    public Transform player;
+    public GameObject damagePopupPrefab; // assign prefab in inspector
 
-    public float health;
+    public Transform player;
+    public Transform aimPoint; //  NEW
+
+    public float health = 100f;
 
     public LayerMask whatIsGround, whatIsPlayer;
 
-    //patroling
+    // Patrol
     public Vector3 walkPoint;
     bool walkPointSet;
-    public float walkPointRange;
+    public float walkPointRange = 10f;
 
-    //atk
-    public float timeBetweenAttacks;
+    // Attack
+    public float timeBetweenAttacks = 1.5f;
     bool alreadyAttacked;
     public GameObject projectile;
+    public float shootForce = 20f;
 
-    //states
-    public float sightRange, attackRange;
+    // States
+    public float sightRange = 15f, attackRange = 10f;
     public bool playerInSightRange, playerInAttackRange;
 
     private void Awake()
     {
-        player = GameObject.Find("PlayerCapsule").transform;
         agent = GetComponent<NavMeshAgent>();
+
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+        {
+            player = playerObj.transform;
+            aimPoint = player.Find("AimPoint"); // AUTO FIND
+        }
     }
 
     private void Update()
     {
-        agent.isStopped = false;
-        //Check for in sight and attack range
+        if (player == null) return;
+
         playerInSightRange = Physics.CheckSphere(transform.position, sightRange, whatIsPlayer);
         playerInAttackRange = Physics.CheckSphere(transform.position, attackRange, whatIsPlayer);
 
         if (!playerInSightRange && !playerInAttackRange) Patroling();
-        if (playerInSightRange && !playerInAttackRange) ChasePlayer();
-        if (playerInSightRange && playerInAttackRange) AttackPlayer();
+        else if (playerInSightRange && !playerInAttackRange) ChasePlayer();
+        else if (playerInSightRange && playerInAttackRange) AttackPlayer();
     }
+
     private void Patroling()
     {
         if (!walkPointSet) SearchWalkPoint();
@@ -49,9 +60,7 @@ public class EnemyAI : MonoBehaviour
         if (walkPointSet)
             agent.SetDestination(walkPoint);
 
-        Vector3 distanceToWalkPoint = transform.position - walkPoint;
-
-        if(distanceToWalkPoint.magnitude < 1f)
+        if (Vector3.Distance(transform.position, walkPoint) < 1f)
             walkPointSet = false;
     }
 
@@ -60,14 +69,18 @@ public class EnemyAI : MonoBehaviour
         float randomZ = Random.Range(-walkPointRange, walkPointRange);
         float randomX = Random.Range(-walkPointRange, walkPointRange);
 
-        walkPoint = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
-        
-        if (Physics.Raycast(walkPoint, -transform.up, 2f, whatIsGround))
+        Vector3 point = new Vector3(transform.position.x + randomX, transform.position.y, transform.position.z + randomZ);
+
+        if (Physics.Raycast(point, Vector3.down, 2f, whatIsGround))
+        {
+            walkPoint = point;
             walkPointSet = true;
+        }
     }
 
     private void ChasePlayer()
     {
+        agent.isStopped = false;
         agent.SetDestination(player.position);
     }
 
@@ -75,9 +88,9 @@ public class EnemyAI : MonoBehaviour
     {
         agent.isStopped = true;
 
-        Vector3 lookPos = player.position;
-        lookPos.y = transform.position.y;
-        transform.LookAt(lookPos);
+        Transform target = aimPoint != null ? aimPoint : player;
+
+        transform.LookAt(target.position); //  LOOK AT REAL HEIGHT
 
         if (!alreadyAttacked)
         {
@@ -87,7 +100,8 @@ public class EnemyAI : MonoBehaviour
                 Quaternion.identity
             ).GetComponent<Rigidbody>();
 
-            rb.AddForce(transform.forward * 20f, ForceMode.Impulse);
+            Vector3 dir = (target.position - rb.position).normalized;
+            rb.AddForce(dir * shootForce, ForceMode.Impulse);
 
             Destroy(rb.gameObject, 3f);
 
@@ -102,11 +116,18 @@ public class EnemyAI : MonoBehaviour
         agent.isStopped = false;
     }
 
-    public void TakeDamage(int  damage)
+    public void TakeDamage(int damage)
     {
         health -= damage;
 
-        if (health <= 0) Invoke(nameof(DestroyEnemy), 0.5f);
+        if (damagePopupPrefab != null)
+        {
+            GameObject popup = Instantiate(damagePopupPrefab, transform.position + Vector3.up * 2f, Quaternion.identity);
+            popup.GetComponent<DamagePopup>().Setup(damage, transform);
+        }
+
+        if (health <= 0)
+            Invoke(nameof(DestroyEnemy), 0.5f);
     }
 
     private void DestroyEnemy()
@@ -121,6 +142,4 @@ public class EnemyAI : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, sightRange);
     }
-
-
 }
