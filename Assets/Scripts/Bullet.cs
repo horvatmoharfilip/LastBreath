@@ -2,22 +2,35 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    public int damage = 10;  // Add a damage value to the bullet
+
     private void OnCollisionEnter(Collision collision)
     {
-        if(collision.gameObject.CompareTag("Target"))
+        // If the bullet hits an enemy
+        if (collision.gameObject.CompareTag("Enemy"))
         {
-            print("hit" + collision.gameObject.name + " !");
-            Destroy(gameObject);
+            EnemyAI enemy = collision.gameObject.GetComponent<EnemyAI>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(damage); // Apply damage to the enemy
+            }
+            Destroy(gameObject);  // Destroy the bullet
+        }
+        // If the bullet hits the player
+        else if (collision.gameObject.CompareTag("Player"))
+        {
+            PlayerHealth playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(damage);  // Apply damage to the player
+            }
+            Destroy(gameObject);  // Destroy the bullet
         }
 
-        if(collision.gameObject.CompareTag("Wall"))
+        // If the bullet hits a wall or something else, just destroy it
+        else if (collision.gameObject.CompareTag("Wall"))
         {
-            print("hit a wall");
             Destroy(gameObject);
         }
     }
-
-
-
-
 }
