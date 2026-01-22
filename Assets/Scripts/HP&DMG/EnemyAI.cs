@@ -11,6 +11,8 @@ public class EnemyAI : MonoBehaviour
     public Transform aimPoint; //  NEW
 
     public float health = 100f;
+    public EnemyHealthBar healthBar; // drag your EnemyHealthBar prefab here in Inspector
+    public int maxHealth = 100;      // optional, for scaling
 
     public LayerMask whatIsGround, whatIsPlayer;
 
@@ -120,6 +122,11 @@ public class EnemyAI : MonoBehaviour
     {
         health -= damage;
 
+        // Update health bar
+        if (healthBar != null)
+            healthBar.SetHealth((int)health); // EnemyHealthBar handles fill & gradient
+
+        // Damage popup
         if (damagePopupPrefab != null)
         {
             GameObject popup = Instantiate(damagePopupPrefab, transform.position + Vector3.up * 2f, Quaternion.identity);
