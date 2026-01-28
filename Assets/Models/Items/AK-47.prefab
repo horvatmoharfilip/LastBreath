@@ -1814,7 +1814,7 @@ GameObject:
   - component: {fileID: 3224788585525090483}
   m_Layer: 0
   m_Name: AK-47
-  m_TagString: PickUp
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1949,20 +1949,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f585f34fef3f984da9f7ead7dbde606, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Weapon
-  PlayerCamera: {fileID: 0}
   isShooting: 0
   readyToShoot: 0
   shootingDelay: 0.1
-  bulletsPerBurst: 3
+  bulletsPerBurst: 1
   burstBulletsLeft: 0
   spreadIntensity: 0.02
   BulletPrefab: {fileID: 2747930795528361032, guid: 6978e5992acf3284ab0c08e7ec476ac9, type: 3}
   bulletSpawn: {fileID: 6361511157803181498}
-  bulletVelocity: 100
+  bulletVelocity: 25
   BulletPrefabLifeTime: 3
+  reloadTime: 1.5
+  magazineSize: 30
+  bulletsLeft: 0
+  isReloading: 0
+  spawnPosition: {x: 0.491, y: 1.214, z: 0.89}
+  spawnRotation: {x: 0, y: 90, z: 0}
   currentShootingMode: 2
-  spawnPosition: {x: 0, y: 0, z: 0}
-  spawnRotation: {x: 0, y: 0, z: 0}
 --- !u!1 &5932100240484635584
 GameObject:
   m_ObjectHideFlags: 0
