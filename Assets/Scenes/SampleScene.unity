@@ -2935,9 +2935,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryToggle
   woodItem: {fileID: 0}
-  gunItem: {fileID: 0}
-  hotBarObj: {fileID: 0}
-  InventorySlotParent: {fileID: 0}
+  gunItem: {fileID: 11400000, guid: 3343047b43aaa0348a72eb5a65449276, type: 2}
+  hotBarObj: {fileID: 186793041}
+  InventorySlotParent: {fileID: 1167376913}
 --- !u!4 &595924489
 Transform:
   m_ObjectHideFlags: 0
@@ -6909,28 +6909,28 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 186793042}
   - {fileID: 640916564}
   - {fileID: 1697697435}
-  - {fileID: 1919696723}
-  - {fileID: 1567858600}
-  - {fileID: 613831325}
-  - {fileID: 1993316455}
   - {fileID: 2120871232}
-  - {fileID: 1640832211}
-  - {fileID: 1852084572}
   - {fileID: 1923250346}
-  - {fileID: 1796616929}
-  - {fileID: 986879943}
   - {fileID: 1855153788}
-  - {fileID: 1379477090}
-  - {fileID: 912184130}
   - {fileID: 1815342733}
-  - {fileID: 998763386}
-  - {fileID: 953206778}
   - {fileID: 1997668007}
+  - {fileID: 1919696723}
+  - {fileID: 613831325}
+  - {fileID: 1640832211}
+  - {fileID: 1796616929}
+  - {fileID: 1379477090}
+  - {fileID: 998763386}
   - {fileID: 1766769147}
+  - {fileID: 1567858600}
+  - {fileID: 1993316455}
+  - {fileID: 1852084572}
+  - {fileID: 986879943}
+  - {fileID: 912184130}
+  - {fileID: 953206778}
   - {fileID: 885645307}
-  - {fileID: 186793042}
   m_Father: {fileID: 1123027371}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
