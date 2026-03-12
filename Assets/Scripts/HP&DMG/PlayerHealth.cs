@@ -1,50 +1,109 @@
-﻿using UnityEngine;
-using UnityEngine.InputSystem; // pomembno za PlayerInput
+﻿using StarterAssets;
+using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerHealth : MonoBehaviour
 {
+    [Header("Health")]
     public int maxHealth = 100;
     private int currentHealth;
-
     public HealthBar healthBar;
+
+    [Header("Stamina")]
+    public float maxStamina = 100f;
+    public float drainRate = 15f;       // stamina lost per second while sprinting
+    public float regenRate = 10f;       // stamina gained per second while not sprinting
+    public float regenDelay = 1.5f;     // seconds to wait before regen starts
+    public HealthBar staminaBar;        // drag your duplicated stamina slider here
+
+    private float currentStamina;
+    private float regenDelayTimer = 0f;
+    private bool isExhausted = false;
+
+    [Header("Other")]
     public GameObject deathScreen;
     public Transform respawnPoint;
 
     private CharacterController controller;
     private PlayerInput playerInput;
+    private StarterAssetsInputs _input;
 
     void Start()
     {
-        currentHealth = maxHealth;
-        healthBar.SetMaxHealth(currentHealth);
-
-        deathScreen.SetActive(false);
-
         controller = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
+        _input = GetComponent<StarterAssetsInputs>();
+
+        // health setup
+        currentHealth = maxHealth;
+        healthBar.SetMaxHealth(currentHealth);
+        deathScreen.SetActive(false);
+
+        // stamina setup
+        currentStamina = maxStamina;
+        staminaBar.SetMaxHealth((int)maxStamina);
     }
+
+    void Update()
+    {
+        HandleStamina();
+    }
+
+    // ---- STAMINA ----
+
+    private void HandleStamina()
+    {
+        bool wantsToSprint = _input.sprint && _input.move != Vector2.zero;
+
+        // clear exhaustion once stamina recovers to 30%
+        if (isExhausted && currentStamina >= maxStamina * 0.3f)
+            isExhausted = false;
+
+        bool isSprinting = wantsToSprint && !isExhausted;
+
+        if (isSprinting)
+        {
+            currentStamina -= drainRate * Time.deltaTime;
+            regenDelayTimer = regenDelay;
+
+            if (currentStamina <= 0f)
+            {
+                currentStamina = 0f;
+                isExhausted = true;
+            }
+        }
+        else
+        {
+            if (regenDelayTimer > 0f)
+                regenDelayTimer -= Time.deltaTime;
+            else if (currentStamina < maxStamina)
+            {
+                currentStamina += regenRate * Time.deltaTime;
+                currentStamina = Mathf.Min(currentStamina, maxStamina);
+            }
+        }
+
+        staminaBar.SetHealth((int)currentStamina);
+    }
+
+    public bool CanSprint() => !isExhausted && currentStamina > 0f;
+
+    // ---- HEALTH ----
 
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
         healthBar.SetHealth(currentHealth);
-
         if (currentHealth <= 0)
-        {
             Die();
-        }
     }
 
     void Die()
     {
         Time.timeScale = 0f;
         deathScreen.SetActive(true);
-
-        // Odkleni miško
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-
-        // Izklopi movement/input
         playerInput.enabled = false;
     }
 
@@ -52,20 +111,20 @@ public class PlayerHealth : MonoBehaviour
     {
         Time.timeScale = 1f;
         deathScreen.SetActive(false);
-
         currentHealth = maxHealth;
         healthBar.SetMaxHealth(currentHealth);
 
-        // Teleport (pomembno za CharacterController)
+        // reset stamina on respawn too
+        currentStamina = maxStamina;
+        staminaBar.SetMaxHealth((int)maxStamina);
+        isExhausted = false;
+
         controller.enabled = false;
         transform.position = respawnPoint.position;
         controller.enabled = true;
 
-        // Zakleni miško nazaj
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
-        // Vklopi input
         playerInput.enabled = true;
     }
 }
