@@ -11,10 +11,10 @@ public class PlayerHealth : MonoBehaviour
 
     [Header("Stamina")]
     public float maxStamina = 100f;
-    public float drainRate = 15f;       // stamina lost per second while sprinting
-    public float regenRate = 10f;       // stamina gained per second while not sprinting
-    public float regenDelay = 1.5f;     // seconds to wait before regen starts
-    public HealthBar staminaBar;        // drag your duplicated stamina slider here
+    public float drainRate = 15f;
+    public float regenRate = 10f;
+    public float regenDelay = 1.5f;
+    public HealthBar staminaBar;
 
     private float currentStamina;
     private float regenDelayTimer = 0f;
@@ -23,6 +23,10 @@ public class PlayerHealth : MonoBehaviour
     [Header("Other")]
     public GameObject deathScreen;
     public Transform respawnPoint;
+
+    [Header("Water")]
+    public float waterDamagePerSecond = 50f;
+    public bool waterInstantKill = false;
 
     private CharacterController controller;
     private PlayerInput playerInput;
@@ -34,12 +38,12 @@ public class PlayerHealth : MonoBehaviour
         playerInput = GetComponent<PlayerInput>();
         _input = GetComponent<StarterAssetsInputs>();
 
-        // health setup
+        // HEALTH
         currentHealth = maxHealth;
         healthBar.SetMaxHealth(currentHealth);
         deathScreen.SetActive(false);
 
-        // stamina setup
+        // STAMINA
         currentStamina = maxStamina;
         staminaBar.SetMaxHealth((int)maxStamina);
     }
@@ -49,13 +53,12 @@ public class PlayerHealth : MonoBehaviour
         HandleStamina();
     }
 
-    // ---- STAMINA ----
+    // ---------------- STAMINA ----------------
 
     private void HandleStamina()
     {
         bool wantsToSprint = _input.sprint && _input.move != Vector2.zero;
 
-        // clear exhaustion once stamina recovers to 30%
         if (isExhausted && currentStamina >= maxStamina * 0.3f)
             isExhausted = false;
 
@@ -88,12 +91,13 @@ public class PlayerHealth : MonoBehaviour
 
     public bool CanSprint() => !isExhausted && currentStamina > 0f;
 
-    // ---- HEALTH ----
+    // ---------------- HEALTH ----------------
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
-        currentHealth -= damage;
+        currentHealth -= Mathf.RoundToInt(damage);
         healthBar.SetHealth(currentHealth);
+
         if (currentHealth <= 0)
             Die();
     }
@@ -111,10 +115,10 @@ public class PlayerHealth : MonoBehaviour
     {
         Time.timeScale = 1f;
         deathScreen.SetActive(false);
+
         currentHealth = maxHealth;
         healthBar.SetMaxHealth(currentHealth);
 
-        // reset stamina on respawn too
         currentStamina = maxStamina;
         staminaBar.SetMaxHealth((int)maxStamina);
         isExhausted = false;
@@ -126,5 +130,22 @@ public class PlayerHealth : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         playerInput.enabled = true;
+    }
+
+    // ---------------- WATER ----------------
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("Water"))
+        {
+            if (waterInstantKill)
+            {
+                TakeDamage(maxHealth);
+            }
+            else
+            {
+                TakeDamage(waterDamagePerSecond * Time.deltaTime);
+            }
+        }
     }
 }
