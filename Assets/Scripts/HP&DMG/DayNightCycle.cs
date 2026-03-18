@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class DayNightSystem : MonoBehaviour
 {
+    [Header("Sun")]
     public Light sun;
     public float daySpeed = 10f;
 
@@ -15,19 +16,38 @@ public class DayNightSystem : MonoBehaviour
 
     void Update()
     {
-        // Rotate sun
+        RotateSun();
+        UpdateLightingAndFog();
+    }
+
+    void RotateSun()
+    {
+        // Vrti sonce (dan/noč cikel)
         sun.transform.Rotate(Vector3.right * daySpeed * Time.deltaTime);
+    }
 
-        // Get sun height
-        float sunHeight = Mathf.Clamp01(sun.transform.forward.y);
+    void UpdateLightingAndFog()
+    {
+        // --- SONCE (osnovni faktor) ---
+        float sunDot = sun.transform.forward.y;
 
-        // Sun intensity
+        // Zamaknjen prehod (noč traja dlje)
+        float sunHeight = Mathf.InverseLerp(-0.2f, 0.3f, sunDot);
+
+        // Zgladi prehod
+        sunHeight = Mathf.SmoothStep(0f, 1f, sunHeight);
+
+        // --- INTENZITETA SONCA ---
         sun.intensity = Mathf.Lerp(0f, 1f, sunHeight);
 
-        // Fog color change
-        RenderSettings.fogColor = Color.Lerp(nightFogColor, dayFogColor, sunHeight);
+        // --- MEGLA (ločeno počasnejši prehod) ---
+        float fogFactor = Mathf.InverseLerp(-0.1f, 0.4f, sunDot);
+        fogFactor = Mathf.SmoothStep(0f, 1f, fogFactor);
 
-        // Fog density change
-        RenderSettings.fogDensity = Mathf.Lerp(nightFogDensity, dayFogDensity, sunHeight);
+        // Barva megle
+        RenderSettings.fogColor = Color.Lerp(nightFogColor, dayFogColor, fogFactor);
+
+        // Gostota megle
+        RenderSettings.fogDensity = Mathf.Lerp(nightFogDensity, dayFogDensity, fogFactor);
     }
 }
