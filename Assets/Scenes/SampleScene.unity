@@ -5565,15 +5565,15 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 751703946}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.000011444092, y: -1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 87655844}
   - {fileID: 1284370150}
   - {fileID: 583606888}
-  m_Father: {fileID: 937451010039325566}
+  m_Father: {fileID: 4253012991390346705}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &757108363
 GameObject:
@@ -6157,6 +6157,7 @@ GameObject:
   - component: {fileID: 886994944}
   - component: {fileID: 886994943}
   - component: {fileID: 886994942}
+  - component: {fileID: 886994946}
   m_Layer: 0
   m_Name: voda
   m_TagString: Untagged
@@ -6179,11 +6180,11 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &886994943
@@ -6258,6 +6259,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &886994946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 886994941}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb259ea71c3c5704e9dfd706cb13714c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WaterDamage
+  damagePerSecond: 50
+  instantKill: 1
 --- !u!1 &965270158
 GameObject:
   m_ObjectHideFlags: 0
@@ -14630,8 +14645,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5242107654389366936}
-  - {fileID: 4253012991390346705}
-  - {fileID: 751703947}
   m_Father: {fileID: 6556307556496023212}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &946213983194927299
@@ -17765,12 +17778,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4253012991390346706}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.000011444092, y: -0.65799904, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 937451010039325566}
+  m_Children:
+  - {fileID: 751703947}
+  m_Father: {fileID: 5242107654389366936}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4253012991390346706
 GameObject:
@@ -18831,7 +18845,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 1.658, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 4253012991390346705}
   m_Father: {fileID: 937451010039325566}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5242107654389366943
@@ -20859,6 +20874,8 @@ MonoBehaviour:
   staminaBar: {fileID: 1724759143}
   deathScreen: {fileID: 1783652053}
   respawnPoint: {fileID: 1938084080}
+  waterDamagePerSecond: 50
+  waterInstantKill: 0
 --- !u!33 &7688804130024306552
 MeshFilter:
   m_ObjectHideFlags: 0
