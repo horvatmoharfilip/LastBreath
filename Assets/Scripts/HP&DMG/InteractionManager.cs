@@ -9,13 +9,9 @@ public class InteractionManager : MonoBehaviour
     private void Awake()
     {
         if (Instance != null && Instance != this)
-        {
             Destroy(gameObject);
-        }
         else
-        {
             Instance = this;
-        }
     }
 
     private void Update()
@@ -27,13 +23,20 @@ public class InteractionManager : MonoBehaviour
         {
             GameObject objectHitByRaycast = hit.transform.gameObject;
 
+            // weapon pickup
             if (objectHitByRaycast.GetComponent<Weapon>())
             {
-                if(Input.GetKeyDown(KeyCode.E))
-                {
+                if (Input.GetKeyDown(KeyCode.E))
                     WeaponManager.Instance.PickupWeapon(objectHitByRaycast.gameObject);
-                }
                 Debug.Log("Weapon Selected");
+            }
+
+            // medkit pickup
+            if (objectHitByRaycast.GetComponent<MedkitHoldable>())
+            {
+                if (Input.GetKeyDown(KeyCode.E))
+                    WeaponManager.Instance.PickupMedkit(objectHitByRaycast.gameObject);
+                Debug.Log("Medkit Selected");
             }
         }
     }

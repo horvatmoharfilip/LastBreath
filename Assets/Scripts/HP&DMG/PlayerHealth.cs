@@ -1,4 +1,4 @@
-﻿using StarterAssets;
+﻿ using StarterAssets;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -147,5 +147,11 @@ public class PlayerHealth : MonoBehaviour
                 TakeDamage(waterDamagePerSecond * Time.deltaTime);
             }
         }
+    }
+
+    public void Heal(int amount)
+    {
+        currentHealth = Mathf.Min(currentHealth + amount, maxHealth);
+        healthBar.SetHealth(currentHealth);
     }
 }

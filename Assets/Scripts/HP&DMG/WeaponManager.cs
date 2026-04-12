@@ -5,9 +5,7 @@ using UnityEngine;
 public class WeaponManager : MonoBehaviour
 {
     public static WeaponManager Instance { get; private set; }
-
     public List<GameObject> weaponSlots;
-
     public GameObject activeWeaponSlot;
 
     private void Awake()
@@ -17,7 +15,6 @@ public class WeaponManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
         Instance = this;
     }
 
@@ -28,27 +25,13 @@ public class WeaponManager : MonoBehaviour
 
     private void Update()
     {
-        foreach(GameObject weaponSlot in weaponSlots)
+        foreach (GameObject weaponSlot in weaponSlots)
         {
-            if(weaponSlot == activeWeaponSlot)
-            {
-                weaponSlot.SetActive(true);
-            }
-            else
-            {
-                weaponSlot.SetActive(false);
-            }
+            weaponSlot.SetActive(weaponSlot == activeWeaponSlot);
         }
 
-        if(Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            SwitchActiveSlot(0);
-        }
-        if(Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            SwitchActiveSlot(1);
-        }
-
+        if (Input.GetKeyDown(KeyCode.Alpha1)) SwitchActiveSlot(0);
+        if (Input.GetKeyDown(KeyCode.Alpha2)) SwitchActiveSlot(1);
     }
 
     public void PickupWeapon(GameObject pickedUpWeapon)
@@ -56,27 +39,53 @@ public class WeaponManager : MonoBehaviour
         AddWeaponIntoActiveSlot(pickedUpWeapon);
     }
 
+    public void PickupMedkit(GameObject medkit)
+    {
+        // drop current weapon if any
+        DropCurrentWeapon(medkit);
+
+        // place medkit into active slot like a weapon
+        medkit.transform.SetParent(activeWeaponSlot.transform, false);
+
+        MedkitHoldable holdable = medkit.GetComponent<MedkitHoldable>();
+        medkit.transform.localPosition = holdable.spawnPosition;
+        medkit.transform.localRotation = Quaternion.Euler(holdable.spawnRotation);
+
+        holdable.isActiveItem = true;
+
+        // disable rigidbody so it doesnt fall
+        Rigidbody rb = medkit.GetComponent<Rigidbody>();
+        if (rb != null) rb.isKinematic = true;
+
+        // disable collider so it doesnt block raycasts
+        Collider col = medkit.GetComponent<Collider>();
+        if (col != null) col.enabled = false;
+    }
+
     private void AddWeaponIntoActiveSlot(GameObject pickedUpWeapon)
     {
         DropCurrentWeapon(pickedUpWeapon);
-
         pickedUpWeapon.transform.SetParent(activeWeaponSlot.transform, false);
 
         Weapon weapon = pickedUpWeapon.GetComponent<Weapon>();
-
-        pickedUpWeapon.transform.localPosition = new Vector3(weapon.spawnPosition.x, weapon.spawnPosition.y, weapon.spawnPosition.z);
-        pickedUpWeapon.transform.localRotation = Quaternion.Euler(weapon.spawnRotation.x, weapon.spawnRotation.y, weapon.spawnRotation.z);
+        pickedUpWeapon.transform.localPosition = weapon.spawnPosition;
+        pickedUpWeapon.transform.localRotation = Quaternion.Euler(weapon.spawnRotation);
 
         weapon.isActiveWeapon = true;
     }
 
     private void DropCurrentWeapon(GameObject pickedUpWeapon)
     {
-        if(activeWeaponSlot.transform.childCount > 0)
+        if (activeWeaponSlot.transform.childCount > 0)
         {
             var weaponToDrop = activeWeaponSlot.transform.GetChild(0).gameObject;
 
-            weaponToDrop.GetComponent<Weapon>().isActiveWeapon = false;
+            // handle both weapon and medkit
+            Weapon w = weaponToDrop.GetComponent<Weapon>();
+            if (w != null) w.isActiveWeapon = false;
+
+            MedkitHoldable m = weaponToDrop.GetComponent<MedkitHoldable>();
+            if (m != null) m.isActiveItem = false;
 
             weaponToDrop.transform.SetParent(pickedUpWeapon.transform.parent);
             weaponToDrop.transform.localPosition = pickedUpWeapon.transform.localPosition;
@@ -88,17 +97,24 @@ public class WeaponManager : MonoBehaviour
     {
         if (activeWeaponSlot.transform.childCount > 0)
         {
-            Weapon currentWeapon = activeWeaponSlot.transform.GetChild(0).GetComponent<Weapon>();
-            currentWeapon.isActiveWeapon = false;
+            var current = activeWeaponSlot.transform.GetChild(0);
+            Weapon w = current.GetComponent<Weapon>();
+            if (w != null) w.isActiveWeapon = false;
+
+            MedkitHoldable m = current.GetComponent<MedkitHoldable>();
+            if (m != null) m.isActiveItem = false;
         }
 
         activeWeaponSlot = weaponSlots[slotNumber];
 
         if (activeWeaponSlot.transform.childCount > 0)
         {
-            Weapon newWeapon = activeWeaponSlot.transform.GetChild(0).GetComponent<Weapon>();
-            newWeapon.isActiveWeapon = true;
+            var next = activeWeaponSlot.transform.GetChild(0);
+            Weapon w = next.GetComponent<Weapon>();
+            if (w != null) w.isActiveWeapon = true;
+
+            MedkitHoldable m = next.GetComponent<MedkitHoldable>();
+            if (m != null) m.isActiveItem = true;
         }
     }
-
 }
