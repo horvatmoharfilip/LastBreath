@@ -14825,6 +14825,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MedkitManager
   medkitCount: 0
   medkitCountText: {fileID: 0}
+  playerHealth: {fileID: 0}
 --- !u!4 &1332133596
 Transform:
   m_ObjectHideFlags: 0
@@ -26808,6 +26809,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
   maxHealth: 100
   healthBar: {fileID: 1973480038}
+  inventory: []
   maxStamina: 100
   drainRate: 15
   regenRate: 10

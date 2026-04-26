@@ -1,6 +1,8 @@
-﻿ using StarterAssets;
+﻿using StarterAssets;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.IO;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -8,6 +10,9 @@ public class PlayerHealth : MonoBehaviour
     public int maxHealth = 100;
     private int currentHealth;
     public HealthBar healthBar;
+
+    [Header("Inventory")]
+    public List<string> inventory = new List<string>();
 
     [Header("Stamina")]
     public float maxStamina = 100f;
@@ -32,25 +37,107 @@ public class PlayerHealth : MonoBehaviour
     private PlayerInput playerInput;
     private StarterAssetsInputs _input;
 
+    private string savePath;
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
         _input = GetComponent<StarterAssetsInputs>();
 
-        // HEALTH
+        savePath = Application.persistentDataPath + "/save.json";
+
+        // HEALTH INIT
         currentHealth = maxHealth;
         healthBar.SetMaxHealth(currentHealth);
         deathScreen.SetActive(false);
 
-        // STAMINA
+        // STAMINA INIT
         currentStamina = maxStamina;
         staminaBar.SetMaxHealth((int)maxStamina);
+
+        // AUTO LOAD
+        LoadGame();
     }
 
     void Update()
     {
         HandleStamina();
+
+        if (Input.GetKeyDown(KeyCode.F5))
+        {
+            SaveGame();
+        }
+
+        if (Input.GetKeyDown(KeyCode.F9))
+        {
+            LoadGame();
+        }
+    }
+
+    void OnApplicationQuit()
+    {
+        SaveGame();
+    }
+
+    // ---------------- SAVE / LOAD ----------------
+
+    [System.Serializable]
+    public class SaveData
+    {
+        public int health;
+        public float posX;
+        public float posY;
+        public float posZ;
+        public List<string> inventory;
+    }
+
+    public void SaveGame()
+    {
+        SaveData data = new SaveData();
+
+        data.health = currentHealth;
+        data.posX = transform.position.x;
+        data.posY = transform.position.y;
+        data.posZ = transform.position.z;
+        data.inventory = inventory;
+
+        string json = JsonUtility.ToJson(data, true);
+        File.WriteAllText(savePath, json);
+
+        Debug.Log("GAME SAVED");
+    }
+
+    public void LoadGame()
+    {
+        if (!File.Exists(savePath))
+        {
+            Debug.Log("Ni save file-a!");
+            return;
+        }
+
+        string json = File.ReadAllText(savePath);
+        SaveData data = JsonUtility.FromJson<SaveData>(json);
+
+        // HEALTH
+        currentHealth = Mathf.Clamp(data.health, 0, maxHealth);
+        healthBar.SetHealth(currentHealth);
+
+        // POSITION
+        controller.enabled = false;
+        transform.position = new Vector3(data.posX, data.posY, data.posZ);
+        controller.enabled = true;
+
+        // INVENTORY
+        inventory = data.inventory;
+
+        // MEDKIT SYNC
+        if (MedkitManager.Instance != null)
+        {
+            MedkitManager.Instance.medkitCount = inventory.Count;
+        }
+
+        Debug.Log("GAME LOADED");
     }
 
     // ---------------- STAMINA ----------------
@@ -102,6 +189,12 @@ public class PlayerHealth : MonoBehaviour
             Die();
     }
 
+    public void Heal(int amount)
+    {
+        currentHealth = Mathf.Min(currentHealth + amount, maxHealth);
+        healthBar.SetHealth(currentHealth);
+    }
+
     void Die()
     {
         Time.timeScale = 0f;
@@ -139,19 +232,9 @@ public class PlayerHealth : MonoBehaviour
         if (other.CompareTag("Water"))
         {
             if (waterInstantKill)
-            {
                 TakeDamage(maxHealth);
-            }
             else
-            {
                 TakeDamage(waterDamagePerSecond * Time.deltaTime);
-            }
         }
-    }
-
-    public void Heal(int amount)
-    {
-        currentHealth = Mathf.Min(currentHealth + amount, maxHealth);
-        healthBar.SetHealth(currentHealth);
     }
 }

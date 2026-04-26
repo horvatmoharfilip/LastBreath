@@ -1,14 +1,16 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 
 public class MedkitManager : MonoBehaviour
 {
     public static MedkitManager Instance { get; private set; }
 
+    [Header("Medkits")]
     public int medkitCount = 0;
-    public TextMeshProUGUI medkitCountText; // drag a UI Text into this in Inspector
+    public TextMeshProUGUI medkitCountText;
 
-    private PlayerHealth playerHealth;
+    [Header("References")]
+    [SerializeField] private PlayerHealth playerHealth;
 
     private void Awake()
     {
@@ -22,13 +24,17 @@ public class MedkitManager : MonoBehaviour
 
     private void Start()
     {
-        playerHealth = FindObjectOfType<PlayerHealth>();
+        // fallback če nisi nastavil v Inspectorju
+        if (playerHealth == null)
+        {
+            playerHealth = FindAnyObjectByType<PlayerHealth>();
+        }
+
         UpdateUI();
     }
 
     private void Update()
     {
-        // press H to use a medkit
         if (Input.GetKeyDown(KeyCode.H))
         {
             UseMedkit();
@@ -38,9 +44,17 @@ public class MedkitManager : MonoBehaviour
     public void PickupMedkit(GameObject medkitObject)
     {
         MedkitItem item = medkitObject.GetComponent<MedkitItem>();
+
         if (item != null)
         {
             medkitCount++;
+
+            // 🔥 poveži z inventory sistemom
+            if (playerHealth != null)
+            {
+                playerHealth.inventory.Add("Medkit");
+            }
+
             UpdateUI();
             Destroy(medkitObject);
         }
@@ -54,16 +68,29 @@ public class MedkitManager : MonoBehaviour
             return;
         }
 
-        if (playerHealth == null) return;
+        if (playerHealth == null)
+        {
+            Debug.LogWarning("PlayerHealth ni najden!");
+            return;
+        }
 
         medkitCount--;
         playerHealth.Heal(25);
+
+        // 🔥 odstrani iz inventory
+        if (playerHealth.inventory.Contains("Medkit"))
+        {
+            playerHealth.inventory.Remove("Medkit");
+        }
+
         UpdateUI();
     }
 
     private void UpdateUI()
     {
         if (medkitCountText != null)
+        {
             medkitCountText.text = "Medkits: " + medkitCount;
+        }
     }
 }
