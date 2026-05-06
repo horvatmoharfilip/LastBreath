@@ -17,6 +17,18 @@ PrefabInstance:
       value: Bullet Variant
       objectReference: {fileID: 0}
     - target: {fileID: 7868630123448770335, guid: 6978e5992acf3284ab0c08e7ec476ac9, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7868630123448770335, guid: 6978e5992acf3284ab0c08e7ec476ac9, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7868630123448770335, guid: 6978e5992acf3284ab0c08e7ec476ac9, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7868630123448770335, guid: 6978e5992acf3284ab0c08e7ec476ac9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
