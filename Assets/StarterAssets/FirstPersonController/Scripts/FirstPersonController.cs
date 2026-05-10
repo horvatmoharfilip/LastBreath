@@ -74,6 +74,7 @@ namespace StarterAssets
 
         private const float _threshold = 0.01f;
 
+
         private bool IsCurrentDeviceMouse
         {
             get
@@ -126,6 +127,7 @@ namespace StarterAssets
 
         private void CameraRotation()
         {
+            if (Cursor.lockState != CursorLockMode.Locked) return;
             if (_input.look.sqrMagnitude >= _threshold)
             {
                 float deltaTimeMultiplier = IsCurrentDeviceMouse ? 1.0f : Time.deltaTime;
