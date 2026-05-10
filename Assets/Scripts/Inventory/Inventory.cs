@@ -110,18 +110,18 @@ public class Inventory : MonoBehaviour
 
     private void EndDrag()
     {
-        if(Input.GetMouseButtonDown(0) && isDragging)
+        if (Input.GetMouseButtonUp(0) && isDragging)
         {
             Slot hovered = GetHoveredSlot();
-            
-            if(hovered != null)
+
+            if (hovered != null)
             {
                 HandleDrop(draggedSlot, hovered);
-
-                dragIcon.enabled=false;
-                draggedSlot = null;
-                isDragging=false;
             }
+
+            dragIcon.enabled = false;
+            draggedSlot = null;
+            isDragging = false;
         }
     }
 

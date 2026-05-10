@@ -15303,7 +15303,7 @@ MonoBehaviour:
   axeItem: {fileID: 0}
   hotbarObj: {fileID: 1206898127}
   inventorySlotParent: {fileID: 708807892}
-  dragIcon: {fileID: 0}
+  dragIcon: {fileID: 620960882}
 --- !u!1 &1307385644
 GameObject:
   m_ObjectHideFlags: 0
