@@ -26,9 +26,7 @@ public class WeaponManager : MonoBehaviour
     private void Update()
     {
         foreach (GameObject weaponSlot in weaponSlots)
-        {
             weaponSlot.SetActive(weaponSlot == activeWeaponSlot);
-        }
 
         if (Input.GetKeyDown(KeyCode.Alpha1)) SwitchActiveSlot(0);
         if (Input.GetKeyDown(KeyCode.Alpha2)) SwitchActiveSlot(1);
@@ -41,24 +39,29 @@ public class WeaponManager : MonoBehaviour
 
     public void PickupMedkit(GameObject medkit)
     {
-        // drop current weapon if any
         DropCurrentWeapon(medkit);
-
-        // place medkit into active slot like a weapon
         medkit.transform.SetParent(activeWeaponSlot.transform, false);
-
         MedkitHoldable holdable = medkit.GetComponent<MedkitHoldable>();
         medkit.transform.localPosition = holdable.spawnPosition;
         medkit.transform.localRotation = Quaternion.Euler(holdable.spawnRotation);
-
         holdable.isActiveItem = true;
-
-        // disable rigidbody so it doesnt fall
         Rigidbody rb = medkit.GetComponent<Rigidbody>();
         if (rb != null) rb.isKinematic = true;
-
-        // disable collider so it doesnt block raycasts
         Collider col = medkit.GetComponent<Collider>();
+        if (col != null) col.enabled = false;
+    }
+
+    public void PickupFood(GameObject food)
+    {
+        DropCurrentWeapon(food);
+        food.transform.SetParent(activeWeaponSlot.transform, false);
+        FoodHoldable holdable = food.GetComponent<FoodHoldable>();
+        food.transform.localPosition = holdable.spawnPosition;
+        food.transform.localRotation = Quaternion.Euler(holdable.spawnRotation);
+        holdable.isActiveItem = true;
+        Rigidbody rb = food.GetComponent<Rigidbody>();
+        if (rb != null) rb.isKinematic = true;
+        Collider col = food.GetComponent<Collider>();
         if (col != null) col.enabled = false;
     }
 
@@ -66,30 +69,30 @@ public class WeaponManager : MonoBehaviour
     {
         DropCurrentWeapon(pickedUpWeapon);
         pickedUpWeapon.transform.SetParent(activeWeaponSlot.transform, false);
-
         Weapon weapon = pickedUpWeapon.GetComponent<Weapon>();
         pickedUpWeapon.transform.localPosition = weapon.spawnPosition;
         pickedUpWeapon.transform.localRotation = Quaternion.Euler(weapon.spawnRotation);
-
         weapon.isActiveWeapon = true;
     }
 
-    private void DropCurrentWeapon(GameObject pickedUpWeapon)
+    private void DropCurrentWeapon(GameObject incoming)
     {
         if (activeWeaponSlot.transform.childCount > 0)
         {
-            var weaponToDrop = activeWeaponSlot.transform.GetChild(0).gameObject;
+            var toDrop = activeWeaponSlot.transform.GetChild(0).gameObject;
 
-            // handle both weapon and medkit
-            Weapon w = weaponToDrop.GetComponent<Weapon>();
+            Weapon w = toDrop.GetComponent<Weapon>();
             if (w != null) w.isActiveWeapon = false;
 
-            MedkitHoldable m = weaponToDrop.GetComponent<MedkitHoldable>();
+            MedkitHoldable m = toDrop.GetComponent<MedkitHoldable>();
             if (m != null) m.isActiveItem = false;
 
-            weaponToDrop.transform.SetParent(pickedUpWeapon.transform.parent);
-            weaponToDrop.transform.localPosition = pickedUpWeapon.transform.localPosition;
-            weaponToDrop.transform.localRotation = pickedUpWeapon.transform.localRotation;
+            FoodHoldable f = toDrop.GetComponent<FoodHoldable>();
+            if (f != null) f.isActiveItem = false;
+
+            toDrop.transform.SetParent(incoming.transform.parent);
+            toDrop.transform.localPosition = incoming.transform.localPosition;
+            toDrop.transform.localRotation = incoming.transform.localRotation;
         }
     }
 
@@ -100,9 +103,10 @@ public class WeaponManager : MonoBehaviour
             var current = activeWeaponSlot.transform.GetChild(0);
             Weapon w = current.GetComponent<Weapon>();
             if (w != null) w.isActiveWeapon = false;
-
             MedkitHoldable m = current.GetComponent<MedkitHoldable>();
             if (m != null) m.isActiveItem = false;
+            FoodHoldable f = current.GetComponent<FoodHoldable>();
+            if (f != null) f.isActiveItem = false;
         }
 
         activeWeaponSlot = weaponSlots[slotNumber];
@@ -112,9 +116,10 @@ public class WeaponManager : MonoBehaviour
             var next = activeWeaponSlot.transform.GetChild(0);
             Weapon w = next.GetComponent<Weapon>();
             if (w != null) w.isActiveWeapon = true;
-
             MedkitHoldable m = next.GetComponent<MedkitHoldable>();
             if (m != null) m.isActiveItem = true;
+            FoodHoldable f = next.GetComponent<FoodHoldable>();
+            if (f != null) f.isActiveItem = true;
         }
     }
 }
