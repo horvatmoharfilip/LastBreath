@@ -52,7 +52,6 @@ public class EnemySpawner : MonoBehaviour
 
     private void SpawnEnemy()
     {
-        // try to find a valid spawn point
         for (int i = 0; i < 10; i++)
         {
             Vector2 randomCircle = Random.insideUnitCircle.normalized;
@@ -60,15 +59,15 @@ public class EnemySpawner : MonoBehaviour
 
             Vector3 spawnPos = new Vector3(
                 player.position.x + randomCircle.x * distance,
-                player.position.y + 10f, // start high so it falls to ground
+                player.position.y,
                 player.position.z + randomCircle.y * distance
             );
 
-            // raycast down to find ground
-            if (Physics.Raycast(spawnPos, Vector3.down, out RaycastHit hit, 20f))
+            // find nearest valid navmesh point
+            if (UnityEngine.AI.NavMesh.SamplePosition(spawnPos, out UnityEngine.AI.NavMeshHit hit, 10f, UnityEngine.AI.NavMesh.AllAreas))
             {
                 GameObject prefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
-                Instantiate(prefab, hit.point, Quaternion.identity);
+                Instantiate(prefab, hit.position, Quaternion.identity);
                 return;
             }
         }
