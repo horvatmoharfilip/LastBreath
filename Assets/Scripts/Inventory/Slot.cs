@@ -16,8 +16,15 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     private void Awake()
     {
-        iconImage = transform.GetChild(0).GetComponent<Image>();
-        amountTxt = transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+        if (transform.childCount >= 2)
+        {
+            iconImage = transform.GetChild(0).GetComponent<Image>();
+            amountTxt = transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+        }
+        else
+        {
+            Debug.LogWarning("Slot " + gameObject.name + " is missing children!");
+        }
     }
 
     public ItemSO GetItem()

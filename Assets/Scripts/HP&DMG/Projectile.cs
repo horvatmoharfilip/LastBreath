@@ -20,6 +20,7 @@ public class Projectile : MonoBehaviour
         if (owner == OwnerType.Player && other.CompareTag("Enemy"))
         {
             other.GetComponent<EnemyAI>()?.TakeDamage(damage);
+            other.GetComponent<MeleeEnemyAI>()?.TakeDamage(damage);
             Destroy(gameObject);
         }
     }

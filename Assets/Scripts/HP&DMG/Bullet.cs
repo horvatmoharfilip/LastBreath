@@ -10,11 +10,12 @@ public class Bullet : MonoBehaviour
         if (collision.gameObject.CompareTag("Enemy"))
         {
             EnemyAI enemy = collision.gameObject.GetComponent<EnemyAI>();
-            if (enemy != null)
-            {
-                enemy.TakeDamage(damage); // Apply damage to the enemy
-            }
-            Destroy(gameObject);  // Destroy the bullet
+            if (enemy != null) enemy.TakeDamage(damage);
+
+            MeleeEnemyAI meleeEnemy = collision.gameObject.GetComponent<MeleeEnemyAI>();
+            if (meleeEnemy != null) meleeEnemy.TakeDamage(damage);
+
+            Destroy(gameObject);
         }
         // If the bullet hits the player
         else if (collision.gameObject.CompareTag("Player"))

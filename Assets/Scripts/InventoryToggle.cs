@@ -19,8 +19,8 @@ public class InventoryToggle : MonoBehaviour
         inventoryGroup.blocksRaycasts = true;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-        fpsController.enabled = false;
-        playerInput.enabled = false;  // add this
+        if (fpsController != null) fpsController.enabled = false;
+        if (playerInput != null) playerInput.enabled = false;
     }
 
     void CloseInventory()
@@ -31,8 +31,8 @@ public class InventoryToggle : MonoBehaviour
         inventoryGroup.blocksRaycasts = false;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        fpsController.enabled = true;
-        playerInput.enabled = true;  // add this
+        if (fpsController != null) fpsController.enabled = true;
+        if (playerInput != null) playerInput.enabled = true;
     }
     void Start()
     {
