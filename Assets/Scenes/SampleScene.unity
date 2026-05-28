@@ -7100,8 +7100,8 @@ MonoBehaviour:
   - {fileID: 4524180246799993403, guid: 40ed3d41e0277eb459854f0fab07b63a, type: 3}
   - {fileID: 5989702864978303518, guid: 8dda7f5c8dd640d429bc20d79d3c28c7, type: 3}
   totalEnemies: 30
-  minSpawnDistance: 100
-  maxSpawnDistance: 250
+  minSpawnDistance: 80
+  maxSpawnDistance: 200
   winScreen: {fileID: 0}
 --- !u!4 &842029107
 Transform:
@@ -27739,13 +27739,13 @@ MonoBehaviour:
   isActiveWeapon: 0
   isShooting: 0
   readyToShoot: 0
-  shootingDelay: 1.5
+  shootingDelay: 1
   bulletsPerBurst: 1
   burstBulletsLeft: 0
   spreadIntensity: 0
   BulletPrefab: {fileID: 1992882210456579190, guid: 9872a705d34fa9547b0a1c7a008e0b0f, type: 3}
   bulletSpawn: {fileID: 2421392155838814096}
-  bulletVelocity: 30
+  bulletVelocity: 25
   BulletPrefabLifeTime: 3
   reloadTime: 1
   magazineSize: 1
