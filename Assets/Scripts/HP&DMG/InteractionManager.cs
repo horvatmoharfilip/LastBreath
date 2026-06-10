@@ -6,6 +6,9 @@ public class InteractionManager : MonoBehaviour
 {
     public static InteractionManager Instance { get; set; }
 
+    [Header("Settings")]
+    public float interactRange = 3f;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -19,24 +22,24 @@ public class InteractionManager : MonoBehaviour
         Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit))
+        if (Physics.Raycast(ray, out hit, interactRange))
         {
-            GameObject objectHitByRaycast = hit.transform.gameObject;
+            GameObject obj = hit.transform.gameObject;
 
-            // weapon pickup
-            if (objectHitByRaycast.GetComponent<Weapon>())
+            if (obj.GetComponent<Weapon>())
             {
                 if (Input.GetKeyDown(KeyCode.E))
-                    WeaponManager.Instance.PickupWeapon(objectHitByRaycast.gameObject);
-                Debug.Log("Weapon Selected");
+                    WeaponManager.Instance.PickupWeapon(obj);
             }
-
-            // medkit pickup
-            if (objectHitByRaycast.GetComponent<MedkitHoldable>())
+            else if (obj.GetComponent<MedkitHoldable>())
             {
                 if (Input.GetKeyDown(KeyCode.E))
-                    WeaponManager.Instance.PickupMedkit(objectHitByRaycast.gameObject);
-                Debug.Log("Medkit Selected");
+                    WeaponManager.Instance.PickupMedkit(obj);
+            }
+            else if (obj.GetComponent<FoodHoldable>())
+            {
+                if (Input.GetKeyDown(KeyCode.E))
+                    WeaponManager.Instance.PickupFood(obj);
             }
         }
     }

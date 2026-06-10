@@ -76,25 +76,34 @@ public class WeaponManager : MonoBehaviour
     }
 
     private void DropCurrentWeapon(GameObject incoming)
+{
+    if (activeWeaponSlot.transform.childCount > 0)
     {
-        if (activeWeaponSlot.transform.childCount > 0)
+        var toDrop = activeWeaponSlot.transform.GetChild(0).gameObject;
+
+        Weapon w = toDrop.GetComponent<Weapon>();
+        if (w != null) w.isActiveWeapon = false;
+
+        MedkitHoldable m = toDrop.GetComponent<MedkitHoldable>();
+        if (m != null) m.isActiveItem = false;
+
+        FoodHoldable f = toDrop.GetComponent<FoodHoldable>();
+        if (f != null) f.isActiveItem = false;
+
+        // odklopi iz roke in vrzi na tla
+        toDrop.transform.SetParent(null);
+
+        Rigidbody rb = toDrop.GetComponent<Rigidbody>();
+        if (rb != null)
         {
-            var toDrop = activeWeaponSlot.transform.GetChild(0).gameObject;
-
-            Weapon w = toDrop.GetComponent<Weapon>();
-            if (w != null) w.isActiveWeapon = false;
-
-            MedkitHoldable m = toDrop.GetComponent<MedkitHoldable>();
-            if (m != null) m.isActiveItem = false;
-
-            FoodHoldable f = toDrop.GetComponent<FoodHoldable>();
-            if (f != null) f.isActiveItem = false;
-
-            toDrop.transform.SetParent(incoming.transform.parent);
-            toDrop.transform.localPosition = incoming.transform.localPosition;
-            toDrop.transform.localRotation = incoming.transform.localRotation;
+            rb.isKinematic = false;
+            rb.AddForce(Camera.main.transform.forward * 2f, ForceMode.Impulse);
         }
+
+        Collider col = toDrop.GetComponent<Collider>();
+        if (col != null) col.enabled = true;
     }
+}
 
     public void SwitchActiveSlot(int slotNumber)
     {
